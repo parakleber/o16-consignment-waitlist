@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consignment inventory reconciliation for Shopify — early access</title>
+<meta name="description" content="A Shopify app that reconciles consignment-reported sales and restocks back into your owned inventory automatically. Join the early access list.">
+<style>
+  :root { color-scheme: light; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; max-width: 680px; margin: 0 auto; padding: 48px 20px; line-height: 1.55; color: #1a1a1a; }
+  h1 { font-size: 1.6rem; margin-bottom: 0.3em; }
+  .sub { color: #555; margin-bottom: 2em; }
+  .pain { background: #f6f6f4; border-left: 3px solid #c9a227; padding: 14px 18px; margin: 1.5em 0; font-size: 0.97rem; }
+  form { margin-top: 2em; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+  label { display: block; margin-top: 14px; font-size: 0.92rem; font-weight: 600; }
+  input[type=email], input[type=text], input[type=number] { width: 100%; padding: 9px; margin-top: 4px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+  .checkbox-row label { margin-top: 0; font-weight: 400; }
+  button { margin-top: 20px; padding: 11px 22px; background: #1a1a1a; color: #fff; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+  button:hover { background: #333; }
+  .note { font-size: 0.82rem; color: #777; margin-top: 12px; }
+  #status { margin-top: 14px; font-size: 0.95rem; }
+  footer { margin-top: 3em; font-size: 0.8rem; color: #999; }
+</style>
+</head>
+<body>
+  <h1>Stop reconciling consignment stock by hand</h1>
+  <p class="sub">A focused Shopify app for shops that mix owned inventory with consigned stock — from other makers, or out at partner retailers.</p>
+
+  <div class="pain">
+    If you restock consigned and owned inventory together, Shopify's stock counts and your consignor reports drift apart fast — and getting them back in sync (without a duplicate vendor payment) is a manual, error-prone chore every cycle.
+  </div>
+
+  <p>We're building a narrow tool that does one thing: reconcile consignment-reported sales and restocks back into your Shopify inventory automatically. No payout automation, no consignor portal to manage — just accurate stock counts.</p>
+
+  <p>If that's a problem you have, we'd like to hear from you and, if it fits, put together a small paid pilot.</p>
+
+  <form id="signup-form">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required placeholder="you@yourstore.com">
+
+    <label for="store">Shopify store URL (optional)</label>
+    <input type="text" id="store" name="store" placeholder="yourstore.myshopify.com">
+
+    <label for="vendors">Roughly how many consignors/vendors do you restock? (optional)</label>
+    <input type="number" id="vendors" name="vendors" min="0" placeholder="e.g. 25">
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="pilot" name="pilot">
+      <label for="pilot">I'd consider a paid pilot ($20+/month) if it solves this</label>
+    </div>
+
+    <button type="submit">Join the early access list</button>
+    <p class="note">We'll only use this to follow up about the pilot — no newsletter, nothing shared or sold. One or two emails, then you're either in the pilot or we tell you we're not building it.</p>
+    <div id="status"></div>
+  </form>
+
+  <footer>Not an active Shopify app yet — this page is checking whether the problem above is worth building for. If there isn't enough interest, we'll say so and not build it.</footer>
+
+  <script>
+    const ENDPOINT = "https://webhook.site/0f51f23a-64fa-4759-94b3-d84d264c9048";
+    const form = document.getElementById("signup-form");
+    const status = document.getElementById("status");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        email: document.getElementById("email").value,
+        store: document.getElementById("store").value,
+        vendors: document.getElementById("vendors").value,
+        pilot_interest: document.getElementById("pilot").checked,
+        submitted_at: new Date().toISOString()
+      };
+      status.textContent = "Submitting...";
+      try {
+        await fetch(ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        form.style.display = "none";
+        status.textContent = "Thanks — you're on the list. We'll email you if we build this.";
+      } catch (err) {
+        status.textContent = "Something went wrong — mind trying again in a moment?";
+      }
+    });
+  </script>
+</body>
+</html>
